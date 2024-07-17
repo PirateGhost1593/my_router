@@ -1,21 +1,12 @@
-import Header from './Header.js';
-import Footer from './Footer.js';
-import Nav from './Nav.js';
-import Home from './Home.js';
-import NewPost from './NewPost.js';
-import PostPage from './PostPage.js';
-import About from './About.js';
-import Error from './Error.js';
-import EditPost from './EditPost.js';
-import {Route, Routes, useNavigate} from 'react-router-dom';
-import {useState, useEffect} from 'react';
+import { createContext, useState, useEffect, Children } from "react";
+import {useNavigate} from 'react-router-dom';
 import {format } from 'date-fns';
-import api from './api/posts.js';
-import useWindowSize from './hooks/useWindowSize.js';
-import useAxiosFetch from './hooks/useAxiosFetch.js';
-import { DataProvider } from './context/DataContext.js';
+import api from '../api/posts.js';
+import useWindowSize from '../hooks/useWindowSize.js';
+import useAxiosFetch from '../hooks/useAxiosFetch.js';
+const DataContext = createContext({});
 
-function App() {
+export const DataProvider = ({children}) => {
   const [posts, setPosts] = useState([]);
 
   const [search, setSearch] = useState('');
@@ -87,48 +78,12 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <DataProvider>
-        <Header title="React JS Blog" width={width}/>
-        <Nav search={search} setSearch={setSearch}/>
-        
-          <Routes>
-            <Route exact path="/" element={<Home 
-              posts={searchResults}
-              fetchError={fetchError}
-              isLoading={isLoading}
-            />}/>
-        
-            <Route exact path="/post" element={<NewPost
-              handleSubmit={handleSubmit}
-              postTitle={postTitle}
-              setPostTitle={setPostTitle}
-              postBody={postBody}
-              setPostBody={setPostBody}
-            />}/>
-
-            <Route exact path="/edit/:id" element={<EditPost
-              handleEdit={handleEdit}
-              editTitle={editTitle}
-              setEditTitle={setEditTitle}
-              editBody={editBody}
-              setEditBody={setEditBody}
-            />}/>   
-        
-            <Route path="/post/:id" element={<PostPage 
-              posts={posts} 
-              handleDelete={handleDelete}
-            />}/>
-            
-            <Route path="/about" element={<About/>}/>
-      
-            <Route path="*" element={<Error/>}/>
-          </Routes>
-
-        <Footer/>
-      </DataProvider>
-    </div>
-  );
+    <DataContext.Provider value={{
+      width
+    }}>
+      {children}
+    </DataContext.Provider>
+  )
 }
 
-export default App;
+export default DataContext
